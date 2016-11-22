@@ -475,8 +475,8 @@ LXC_COMMAND_MAP = {
             'backing_store': '--backingstore',
             'lxc_path': '--lxcpath',
             'fs_size': '--fssize',
-            'name': '--orig',
-            'clone_name': '--new'
+            'name': '--name',
+            'clone_name': '--newname'
         }
     }
 }
@@ -752,7 +752,7 @@ class LxcContainerManagement(object):
         if config_change:
             container_state = self._get_state()
             if container_state != 'stopped':
-                self.container.stop()
+                self.container.shutdown()
 
             with open(container_config_file, 'wb') as f:
                 f.writelines(container_config)
@@ -787,7 +787,7 @@ class LxcContainerManagement(object):
             self.container.stop()
 
         build_command = [
-            self.module.get_bin_path('lxc-clone', True),
+            self.module.get_bin_path('lxc-copy', True),
         ]
 
         build_command = self._add_variables(
@@ -808,7 +808,7 @@ class LxcContainerManagement(object):
 
         rc, return_data, err = self._run_command(build_command)
         if rc != 0:
-            message = "Failed executing lxc-clone."
+            message = "Failed executing lxc-copy."
             self.failure(
                 err=err, rc=rc, msg=message, command=' '.join(
                     build_command
@@ -1016,7 +1016,7 @@ class LxcContainerManagement(object):
 
             if self._get_state() != 'stopped':
                 self.state_change = True
-                self.container.stop()
+                self.container.shutdown()
 
             if self.container.destroy():
                 self.state_change = True
@@ -1088,7 +1088,7 @@ class LxcContainerManagement(object):
             self._config()
 
             if self._get_state() != 'stopped':
-                self.container.stop()
+                self.container.shutdown()
                 self.state_change = True
 
             # Run container startup
@@ -1121,7 +1121,7 @@ class LxcContainerManagement(object):
             self._config()
 
             if self._get_state() != 'stopped':
-                self.container.stop()
+                self.container.shutdown()
                 self.state_change = True
 
             # Check if the container needs to have an archive created.
@@ -1543,7 +1543,7 @@ class LxcContainerManagement(object):
                 if container_state == 'running':
                     self.container.freeze()
                 else:
-                    self.container.stop()
+                    self.container.shutdown()
 
             # Sync the container data from the container_path to work_dir
             self._rsync_data(lxc_rootfs, temp_dir)
