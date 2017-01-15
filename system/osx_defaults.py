@@ -84,7 +84,9 @@ EXAMPLES = '''
 '''
 
 import datetime
-from ansible.module_utils.basic import *
+import re
+
+from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.pycompat24 import get_exception
 
 # exceptions --------------------------------------------------------------- {{{
@@ -105,7 +107,7 @@ class OSXDefaults(object):
         self.current_value = None
 
         # Just set all given parameters
-        for key, val in kwargs.iteritems():
+        for key, val in kwargs.items():
             setattr(self, key, val)
 
         # Try to find the defaults executable
@@ -347,6 +349,7 @@ def main():
             value=dict(
                 default=None,
                 required=False,
+                type='raw'
             ),
             state=dict(
                 default="present",

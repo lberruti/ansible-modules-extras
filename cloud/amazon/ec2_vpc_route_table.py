@@ -229,7 +229,7 @@ def get_resource_tags(vpc_conn, resource_id):
 
 def tags_match(match_tags, candidate_tags):
     return all((k in candidate_tags and candidate_tags[k] == v
-                for k, v in match_tags.iteritems()))
+                for k, v in match_tags.items()))
 
 
 def ensure_tags(vpc_conn, resource_id, tags, add_only, check_mode):
@@ -299,7 +299,7 @@ def route_spec_matches_route(route_spec, route):
             if all((not route.gateway_id, not route.instance_id, not route.interface_id, not route.vpc_peering_connection_id)):
                 return True
 
-    for k in key_attr_map.iterkeys():
+    for k in key_attr_map:
         if k in route_spec:
             if route_spec[k] != getattr(route, k):
                 return False
